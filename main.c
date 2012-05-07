@@ -1,6 +1,6 @@
-#include <iostream>
-int main (void)
+#include <stdio.h>
+int main(void)
 {
-　　cout << "Hello, world!" << endl;
-return 0;
-} 
+  printf("Hello,Master Yang!\n");
+  return 0;
+}
