@@ -1,3 +1,13 @@
+#fileStream
+fileStream:fileStream.o
+	gcc -o fileStream fileStream.o
+fileStream.o:fileStream.c
+	gcc -c fileStream.c
+#fileReadSeek
+fileReadSeek:fileReadSeek.o
+	gcc -o fileReadSeek fileReadSeek.o
+fileReadSeek.o:fileReadSeek.c
+	gcc -c fileReadSeek.c
 #fileOpen
 fileOpen:fileOpen.o
 	gcc -o fileOpen fileOpen.o
@@ -20,4 +30,4 @@ main.o:main.c
 	gcc -c main.c
 #clean
 clean:
-	rm main.o main fileOpen.o fileOpen fileRead.o fileRead fileWrite fileWrite.o
+	rm main.o main fileOpen.o fileOpen fileRead.o fileRead fileWrite fileWrite.o fileReadSeek fileReadSeek.o fileStream fileStream.o

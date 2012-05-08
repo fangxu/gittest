@@ -1,2 +1,13 @@
 Master Yang!
 It's a branch of Yang.
+
+Make Command:
+
+make fileOpen
+make fileRead
+make fileWrite
+make fileReadSeek
+make fileStream
+
+make clean
+make main
