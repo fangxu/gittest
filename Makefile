@@ -1,3 +1,11 @@
+#socket
+socket:socketServer.o socketClient.o
+	gcc -o socketServer socketServer.o
+	gcc -o socketClient socketClient.o
+socketServer.o:socketServer.c
+	gcc -c socketServer.c
+socketClient.o:socketClient.c
+	gcc -c socketClient.c
 #fileStream
 fileStream:fileStream.o
 	gcc -o fileStream fileStream.o
@@ -30,4 +38,4 @@ main.o:main.c
 	gcc -c main.c
 #clean
 clean:
-	rm main.o main fileOpen.o fileOpen fileRead.o fileRead fileWrite fileWrite.o fileReadSeek fileReadSeek.o fileStream fileStream.o
+	rm main.o main fileOpen.o fileOpen fileRead.o fileRead fileWrite fileWrite.o fileReadSeek fileReadSeek.o fileStream fileStream.o socketServer socketServer.o socketClient socketClient.o

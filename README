@@ -8,6 +8,7 @@ make fileRead
 make fileWrite
 make fileReadSeek
 make fileStream
+make socket
 
 make clean
 make main
