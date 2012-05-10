@@ -1,41 +1,83 @@
-#include<sys/types.h>
-#include<sys/socket.h>
-#include<stdio.h>
-#include<netinet/in.h>
-#include<arpa/inet.h>
-#include<unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h> /* for struct sockaddr_in*/
+
+#define BACKLOG 10
+#define MYPORT  4000
 
 int main()
 {
-	int server_sockfd,client_sockfd;
-	int server_len,client_len;
-	struct sockaddr_in server_address;
-	struct sockaddr_in client_address;
-	server_sockfd=socket(AF_INET,SOCK_STREAM,0);
-	server_address.sin_family=AF_INET;
-	server_address.sin_addr.s_addr=inet_addr("127.0.0.1");
-	server_address.sin_port=9734;
-	server_len=sizeof(server_address);
-	bind(server_sockfd,(struct sockaddr *)&server_address,server_len);
-	listen(server_sockfd,5);
-	
-	while(1)
+	char *addr;
+	int sockfd;
+	int new_fd;
+	struct sockaddr_in my_addr, their_addr;
+
+	int res;
+	int sin_size;
+
+	char *buf;
+	/* 取得套接字描述符*/
+	sockfd = socket(AF_INET,     /* domain*/
+					SOCK_STREAM, /* type*/
+					0);          /* protocol*/
+
+	if (sockfd == -1) 
 	{
-		char ch;
-		char s[200];
-		int recvbyte;
-		printf("wait for message\n");
-		client_len=sizeof(client_address);
-		client_sockfd=accept(server_sockfd,(struct sockaddr *)&client_address,(socklen_t *__restrict)&client_len);
-		//while(read(client_sockfd,&ch,1)!=0)
-		//{
-		//	putchar(ch);
-		//}
-		recvbyte=recv(client_sockfd,s,1, 0);
-		//s[recvbyte]='\n';
-		printf("%s\n",s);
-		//ch++;
-		//write(client_sockfd,&ch,1);
-		close(client_sockfd);
+		perror("socket");
+		exit(1);
 	}
+
+	/* Init sockaddr_in */
+	my_addr.sin_family = AF_INET;                /* 注意: 应使用主机字节顺序*/
+	my_addr.sin_port = htons(MYPORT);            /* 注意: 应使用网络字节顺序*/
+	my_addr.sin_addr.s_addr = htonl(INADDR_ANY); /* 使用自己的 IP 地址 */
+	bzero(&(my_addr.sin_zero), 8);               /* 结构的其余的部分须置 0*/
+
+	/* 指定一个套接字使用的地址及端口*/
+	res = bind(sockfd, (struct sockaddr*)&my_addr, sizeof(struct sockaddr));
+	if (res == -1) 
+	{
+		perror("bind");
+		exit(1);
+	}
+
+	/* 监听请求, 等待连接*/
+	res = listen(sockfd,
+				BACKLOG);  /* 未经处理的连接请求队列可容纳的最大数目*/               
+	if (res == -1) {
+		perror("listen");
+		exit(1);
+	}
+
+	/* 接受对方的连接请求, 建立连接，返回一个新的连接描述符.
+	* 而第一个套接字描述符仍在你的机器上原来的端口 listen()
+	*/
+	sin_size = sizeof(struct sockaddr_in);
+	new_fd = accept(sockfd, (void *)&their_addr, &sin_size);
+
+	buf = (char *)malloc(255);
+	if (buf == NULL) {
+		printf("malloc failed\n");
+		exit(1);
+	}
+
+	/* 接受对方发来的数据*/
+	res = recv(new_fd, buf, 255, 0);
+	if (res == -1) {
+		perror("recv()");
+		exit(1);
+	}
+
+	/* 关闭本次连接*/
+	close(new_fd);
+
+	/* 关闭系统监听*/
+	close(sockfd);
+
+	printf("recv data:%s\n", buf);
+	free(buf);
+	return 0;
 }
