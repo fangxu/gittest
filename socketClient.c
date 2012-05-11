@@ -3,7 +3,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h> /*for struct sockaddr_in*/
-#include<stdio.h>
+#include <stdio.h>
 
 #define DEST_IP   "127.0.0.1"
 #define DEST_PORT 4000
@@ -14,7 +14,7 @@ int main()
 	int sockfd;
 	struct sockaddr_in dest_addr;
 
-	char *msg ;
+	char msg[50];
 	int len, bytes_sent;
 
 	/* 取得一个套接字*/
@@ -22,7 +22,7 @@ int main()
 	if (sockfd == -1) 
 	{
 		perror("socket()");
-		exit(1);
+		return 1;
 	}
 
 	/* 设置远程连接的信息*/
@@ -36,15 +36,16 @@ int main()
 	if (res == -1) 
 	{
 		perror("connect()");
-		exit(1);
+		return 1;
 	}
-	scanf("%s",msg);
-	len = strlen(msg);
-	bytes_sent = send(sockfd, /* 连接描述符*/
-						msg,    /* 发送内容*/
-						len,    /* 发关内容长度*/
-						0);     /* 发送标记, 一般置 0*/
-  
+	int i=0;
+	for(;i<10;i++)
+	{
+		scanf("%s",msg);	
+		len = strlen(msg);	
+		bytes_sent = send(sockfd,msg,len,0);
+	}
+	
 
 	/* 关闭连接*/
 	close(sockfd);

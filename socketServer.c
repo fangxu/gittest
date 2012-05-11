@@ -18,7 +18,7 @@ int main()
 	int res;
 	int sin_size;
 
-	char *buf;
+	char buf[50];
 	/* 取得套接字描述符*/
 	sockfd = socket(AF_INET,     /* domain*/
 					SOCK_STREAM, /* type*/
@@ -27,7 +27,7 @@ int main()
 	if (sockfd == -1) 
 	{
 		perror("socket");
-		exit(1);
+		return 1;
 	}
 
 	/* Init sockaddr_in */
@@ -41,7 +41,7 @@ int main()
 	if (res == -1) 
 	{
 		perror("bind");
-		exit(1);
+		return 1;
 	}
 
 	/* 监听请求, 等待连接*/
@@ -49,7 +49,7 @@ int main()
 				BACKLOG);  /* 未经处理的连接请求队列可容纳的最大数目*/               
 	if (res == -1) {
 		perror("listen");
-		exit(1);
+		return 1;
 	}
 
 	/* 接受对方的连接请求, 建立连接，返回一个新的连接描述符.
@@ -58,26 +58,24 @@ int main()
 	sin_size = sizeof(struct sockaddr_in);
 	new_fd = accept(sockfd, (void *)&their_addr, &sin_size);
 
-	buf = (char *)malloc(255);
-	if (buf == NULL) {
-		printf("malloc failed\n");
-		exit(1);
+	
+	int i =0;
+	for(;i<10;i++)
+	{
+		/* 接受对方发来的数据*/
+		res = recv(new_fd, buf, 255, 0);
+		if (res == -1) {
+			perror("recv()");
+			return 1;
+		}
+		printf("recv data:%s\n", buf);
+		memset(buf,0,sizeof(buf)); 
 	}
-
-	/* 接受对方发来的数据*/
-	res = recv(new_fd, buf, 255, 0);
-	if (res == -1) {
-		perror("recv()");
-		exit(1);
-	}
-
 	/* 关闭本次连接*/
 	close(new_fd);
 
 	/* 关闭系统监听*/
-	close(sockfd);
-
-	printf("recv data:%s\n", buf);
-	free(buf);
+	close(sockfd);	
+	
 	return 0;
 }
